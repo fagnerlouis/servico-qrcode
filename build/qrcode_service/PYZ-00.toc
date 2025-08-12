@@ -1,4 +1,4 @@
-('C:\\fag\\home\\ubuntu\\build\\qrcode_service\\PYZ-00.pyz',
+('C:\\fag\\home\\qrcode\\build\\qrcode_service\\PYZ-00.pyz',
  [('PIL',
    'C:\\Users\\fagner.nascimento\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PIL\\__init__.py',
    'PYMODULE'),
