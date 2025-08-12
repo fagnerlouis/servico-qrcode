@@ -76,6 +76,4 @@ Se você preferir ter um arquivo `.exe` independente, pode usar o PyInstaller no
 
 ## Próximos Passos (Instalador)
 
-Com o arquivo `qrcode_service.exe` gerado (Opção 2), você pode usar ferramentas como [Inno Setup](https://jrsoftware.org/isinfo.php) ou [NSIS](https://nsis.sourceforge.io/Main_Page) para criar um instalador `.msi` ou `.exe` mais tradicional, que pode adicionar atalhos, configurar o serviço para iniciar com o Windows, etc. A criação desses scripts de instalação está fora do escopo atual, mas pode ser feita com base no `.exe` gerado.
-
-Se precisar de ajuda com alguma dessas etapas, me informe!
+Com o arquivo `qrcode_service.exe` gerado (Opção 2), você pode usar ferramentas como [Inno Setup](https://jrsoftware.org/isinfo.php) ou [NSIS](https://nsis.sourceforge.io/Main_Page) para criar um instalador `.msi` ou `.exe` mais tradicional, que pode adicionar atalhos, configurar o serviço para iniciar com o Windows, etc.
