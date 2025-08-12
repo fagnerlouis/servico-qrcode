@@ -21,13 +21,10 @@ UninstallDisplayIcon={app}\qrcode_service.exe
 
 [Files]
 ; Adiciona o executável do serviço ao instalador
-; O caminho foi corrigido para apontar para o executável na mesma pasta do script.
 Source: "qrcode_service.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [UninstallRun]
 ; Comando para parar e desinstalar o serviço do Windows
-; O parâmetro "/C" é crucial para que o cmd execute e feche a janela
-; Usando a definição MyServiceName para consistência
 Filename: "{sys}\cmd.exe"; Parameters: "/C sc stop ""{#MyServiceName}"" & sc delete ""{#MyServiceName}"""; Flags: runhidden
 
 
@@ -37,16 +34,12 @@ var
   PortNumberEdit: TNewEdit;
 
 // Função para validar a entrada do usuário na página de porta
-// Retorna True se a entrada for válida, False caso contrário.
 function ValidatePortInput(Sender: TWizardPage): Boolean;
 var
   PortValue: Integer;
 begin
   try
-    // Tenta converter o texto para um inteiro. Se falhar, vai para o bloco 'except'.
     PortValue := StrToInt(PortNumberEdit.Text);
-
-    // Se a conversão for bem-sucedida, verifica se a porta está no intervalo permitido
     if (PortValue < 1024) or (PortValue > 65535) then
     begin
       MsgBox('A porta deve ser um número entre 1024 e 65535.', mbError, MB_OK);
@@ -54,11 +47,9 @@ begin
     end
     else
     begin
-      // Se estiver tudo correto, o resultado é verdadeiro
       Result := True;
     end;
   except
-    // Este bloco é executado se StrToInt falhar (ex: texto não é um número)
     MsgBox('Por favor, insira um número válido para a porta.', mbError, MB_OK);
     Result := False;
   end;
@@ -84,7 +75,6 @@ begin
   PortNumberEdit.Top := ScaleY(100);
   PortNumberEdit.Width := ScaleX(200);
   
-  // Conecta a função de validação ao botão "Avançar" da página
   PortPage.OnNextButtonClick := @ValidatePortInput;
 end;
 
@@ -97,22 +87,30 @@ end;
 // Evento que executa após a instalação dos arquivos
 procedure CurStepChanged(CurStep: TSetupStep);
 var
-  ServiceCommand: string;
+  CreateServiceCmd: string;
+  StartServiceCmd: string;
   ResultCode: Integer;
-  AppPath: string;
+  FullBinPath: string;
   ServiceName: string;
   AppDisplayName: string;
 
 begin
   if CurStep = ssPostInstall then
   begin
-    AppPath := AddQuotes(ExpandConstant('{app}\qrcode_service.exe'));
+    // Prepara as variáveis
+    FullBinPath := ExpandConstant('{app}\qrcode_service.exe') + ' --port=' + PortNumberEdit.Text;
+    FullBinPath := AddQuotes(FullBinPath);
     ServiceName := '{#MyServiceName}';
     AppDisplayName := '{#MyAppName}';
 
-    ServiceCommand := Format('/C sc create "%s" binPath= "%s --port=%s" start=auto DisplayName="%s" & sc start "%s"', [ServiceName, AppPath, PortNumberEdit.Text, AppDisplayName, ServiceName]);
+    // CORREÇÃO: Separar a criação e o início em dois comandos distintos
 
+    // 1. Comando para CRIAR o serviço
+    CreateServiceCmd := Format('/C sc create "%s" binPath=%s start=auto DisplayName="%s"', [ServiceName, FullBinPath, AppDisplayName]);
+    Exec(ExpandConstant('{sys}\cmd.exe'), CreateServiceCmd, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
-    Exec(ExpandConstant('{sys}\cmd.exe'), ServiceCommand, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    // 2. Comando para INICIAR o serviço
+    StartServiceCmd := Format('/C sc start "%s"', [ServiceName]);
+    Exec(ExpandConstant('{sys}\cmd.exe'), StartServiceCmd, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 end;

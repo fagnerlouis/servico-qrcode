@@ -2,7 +2,15 @@
 from flask import Flask, request, send_file
 import qrcode
 import io
-import argparse # Importando a biblioteca para argumentos
+import argparse
+from waitress import serve # Importa o servidor 'waitress'
+
+# --- Lógica de Argumentos ---
+# Movemos a leitura da porta para cá, para que seja sempre executada
+parser = argparse.ArgumentParser(description='QR Code Service')
+parser.add_argument('--port', type=int, default=3000, help='Porta para rodar o servidor')
+args = parser.parse_args()
+# -----------------------------
 
 app = Flask(__name__)
 
@@ -38,11 +46,8 @@ def generate_qrcode():
     # Retorna a imagem
     return send_file(img_io, mimetype='image/png')
 
+# --- Inicia o Servidor ---
+# Usamos o 'serve' do waitress em vez do 'app.run'
 if __name__ == '__main__':
-    # 1. Configura o parser de argumentos
-    parser = argparse.ArgumentParser(description='QR Code Service')
-    parser.add_argument('--port', type=int, default=3000, help='Porta para rodar o servidor Flask')
-    args = parser.parse_args()
-
-    # 2. Roda o servidor usando a porta do argumento
-    app.run(host='0.0.0.0', port=args.port)
+    print(f"Iniciando servidor na porta {args.port}...")
+    serve(app, host='0.0.0.0', port=args.port)
