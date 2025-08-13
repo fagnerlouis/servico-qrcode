@@ -17,14 +17,15 @@ app = Flask(__name__)
 @app.route('/generate')
 def generate_qrcode():
     # Obtém o valor do parâmetro 'qrcode' da URL.
-    text = request.args.get('qrcode', 'https://github.com/fagnerlouis/servico-qrcode')
+    # Se for vazio ou não existir, usa o link do GitHub como padrão.
+    text = request.args.get('qrcode') or 'https://github.com/fagnerlouis/servico-qrcode'
 
     # Obtém o valor do parâmetro 'border' da URL.
     try:
         border_size = int(request.args.get('border', 1))
     except (ValueError, TypeError):
         border_size = 1
-    
+
     # Cria o objeto QR code
     qr = qrcode.QRCode(
         version=1,
