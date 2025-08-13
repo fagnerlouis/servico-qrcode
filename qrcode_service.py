@@ -51,4 +51,5 @@ def generate_qrcode():
 # Usamos o 'serve' do waitress em vez do 'app.run'
 if __name__ == '__main__':
     print(f"Iniciando servidor na porta {args.port}...")
-    serve(app, host='0.0.0.0', port=args.port)
+    # Aumenta o número de threads para suportar mais requisições simultâneas
+    serve(app, host='0.0.0.0', port=args.port, threads=16)
